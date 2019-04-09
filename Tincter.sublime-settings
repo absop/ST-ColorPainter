@@ -1,0 +1,41 @@
+{
+    // oprions: "", "dot", "circle", "bookmark"
+    "gutter_icon": "circle",
+
+    "highlight_style": {
+        "full_text": "text",
+        "selection": "fill",
+    },
+    "file_types": [
+        "txt",
+        "py",
+        "css",
+        "less",
+        "scss",
+        "sass",
+        "styl",
+        "html",
+        "xml",
+        "tmTheme",
+        "sublime-theme",
+        "sublime-color-scheme",
+    ],
+
+    // Change their order or remove one of them
+    // from the color_modes to get a better effeciency.
+    "color_modes": [
+        "hex8",
+        "hex6",
+        "hex4",
+        "hex3",
+        "hsl",
+        "hsla",
+        "rgb",
+        "rgba",
+        "css_named",
+    ],
+
+    "syntax_specific": {
+        "py": ["hsl", "hsla", "hex3"]
+    }
+}
