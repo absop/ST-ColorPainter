@@ -10,8 +10,21 @@ scheme_data = {
     "rules": []
 }
 
+error_gutter_icon = """
+Unsupported gutter_icon\t\"{}\"!
+Supported icons are \"dot\", \"circle\", \"bookmark\" and \"\"(nothing).
+Please make your selection among them!
+"""
 
-STYLE_SELECTION = sublime.DRAW_NO_OUTLINE|sublime.HIDE_ON_MINIMAP
+error_color_modes_missing = """
+Tincter not work at current file, because no color_modes
+are added! If you had added color_modes for current file,
+it's because settings still not be loaded.
+                                Restart will be helpful!
+"""
+
+
+STYLE_SELECTION = sublime.DRAW_NO_OUTLINE
 STYLE_FULL_TEXT = sublime.DRAW_NO_OUTLINE|sublime.DRAW_EMPTY_AS_OVERWRITE
 
 
@@ -45,18 +58,6 @@ color_regexs = {
     "hsla": r"hsla\(" + hsl_values + alpah_channel + r"\)",
     "css_named": r"\b(?:" + r"|".join(sublime_css_colors) + r")\b"
 }
-
-
-color_identify_number = 0
-
-
-def _color_key_scope():
-    global color_identify_number
-    color_id = str(color_identify_number)
-    key = "tincter_color_" + color_id
-    scope = color_id + ".color.tincter"
-    color_identify_number += 1
-    return (key, scope)
 
 
 def _color_scheme_cache_dir(relative=True):

@@ -23,6 +23,8 @@
 
     // Change their order or remove one of them
     // from the color_modes to get a better effeciency.
+    // But keep in mind do not changing the order of hex{d}
+    // is meaningless.
     "color_modes": [
         "hex8",
         "hex6",
