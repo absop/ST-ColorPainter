@@ -179,23 +179,19 @@ class TincterViewEventListener(object):
 
         return key_regions
 
-    def add_regions(self, key_regions, style):
+    def tinct_regions(self, regions):
+        key_regions = []
+        for region in regions:
+            key_regions.extend(self.get_new_colors_in_region(region))
         if len(key_regions) > 0:
             TincterViewsManager.write_scheme()
-
             gutter_icon = TincterViewsManager.gutter_icon
+            style = TincterViewsManager.style_full_text
             for key, regions in key_regions:
                 self.view.add_regions(key, regions,
                     scope=key,
                     icon=gutter_icon,
                     flags=style)
-
-    def tinct_regions(self, regions):
-        key_regions = []
-        for region in regions:
-            key_regions.extend(self.get_new_colors_in_region(region))
-        style = TincterViewsManager.style_full_text
-        self.add_regions(key_regions, style)
 
     def tinct_full_text(self):
         region = sublime.Region(0, self.view.size())
@@ -264,6 +260,7 @@ class TincterViewEventListener(object):
         self.tinct_selection()
 
     def on_modified(self):
+        # TODO: too much!
         self.tinct_regions(self.modified_regions())
         # self.reload()
         # self.on_selection_modified()
