@@ -108,7 +108,8 @@ class TincterViewEventListener(object):
         self.reload()
 
     def rebuild_scheme_rules(self, bg_full_text, bg_selection):
-        entry = ["rebuild color scheme...", self.view.file_name()]
+        filename = self.view.file_name() or "untitled"
+        entry = ["rebuild color scheme...", filename]
         Loger.print("\n\t".join(entry))
 
         # TODO: make colors displayed more clearly.
