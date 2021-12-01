@@ -16,33 +16,33 @@ class Loger:
 
     def print(*args):
         if Loger.debug:
-            print("[Tincter:]", *args)
+            print("ColorPainter:", *args)
 
     def error(errmsg):
         sublime.error_message(errmsg)
 
 
-class TincterToggleLogCommand(sublime_plugin.TextCommand):
+class ColorPainterToggleLogCommand(sublime_plugin.TextCommand):
     def run(self, edit):
         Loger.debug = not Loger.debug
 
 
-class TincterCommand(sublime_plugin.TextCommand):
+class ColorPainterCommand(sublime_plugin.TextCommand):
     def log_command(self):
         filename = self.view.file_name() or "untitled"
         Loger.print("{}:".format(self.name()), filename)
 
 
-class TincterTinctViewCommand(TincterCommand):
+class ColorPainterPaintViewCommand(ColorPainterCommand):
     def run(self, edit):
         self.log_command()
-        TincterViewsManager.tinct_view(self.view)
+        ColorPainterViewsManager.paint_view(self.view)
 
 
-class TincterClearViewCommand(TincterCommand):
+class ColorPainterClearViewCommand(ColorPainterCommand):
     def run(self, edit):
         self.log_command()
-        TincterViewsManager.clear_view(self.view)
+        ColorPainterViewsManager.clear_view(self.view)
 
 
 class ColorSchemeWriter(object):
@@ -80,11 +80,11 @@ class ColorSchemeWriter(object):
         Loger.print("\n\t".join(entry))
 
 
-class TincterViewEventListener(object):
+class ColorPainterViewEventListener(object):
     def __init__(self, view, color_modes):
         self.view = view
         no = str(view.view_id)
-        self.key_prefix = "tincter" + no + "_"
+        self.key_prefix = "painter" + no + "_"
         self.color_number = 0
         self.selection_points = []
         self.keys_selection = {}
@@ -121,7 +121,7 @@ class TincterViewEventListener(object):
             pass
 
     def change_gutter_icon(self, gutter_icon):
-        style = TincterViewsManager.style_full_text
+        style = ColorPainterViewsManager.style_full_text
         for row in self.keys_full_text:
             for key in self.keys_full_text[row]:
                 regions = self.view.get_regions(key)
@@ -156,8 +156,8 @@ class TincterViewEventListener(object):
 
     def get_new_colors_in_region(self, region):
         key_regions = []
-        make_rule_full_text = TincterViewsManager.make_rule_full_text
-        make_rule_selection = TincterViewsManager.make_rule_selection
+        make_rule_full_text = ColorPainterViewsManager.make_rule_full_text
+        make_rule_selection = ColorPainterViewsManager.make_rule_selection
         conten = self.view.substr(region)
         b = region.begin()
         for match in self.regex.finditer(conten):
@@ -180,33 +180,33 @@ class TincterViewEventListener(object):
 
         return key_regions
 
-    def tinct_regions(self, regions):
+    def paint_regions(self, regions):
         key_regions = []
         for region in regions:
             key_regions.extend(self.get_new_colors_in_region(region))
         if len(key_regions) > 0:
-            TincterViewsManager.write_scheme()
-            gutter_icon = TincterViewsManager.gutter_icon
-            style = TincterViewsManager.style_full_text
+            ColorPainterViewsManager.write_scheme()
+            gutter_icon = ColorPainterViewsManager.gutter_icon
+            style = ColorPainterViewsManager.style_full_text
             for key, regions in key_regions:
                 self.view.add_regions(key, regions,
                     scope=key,
                     icon=gutter_icon,
                     flags=style)
 
-    def tinct_full_text(self):
+    def paint_full_text(self):
         region = sublime.Region(0, self.view.size())
-        self.tinct_regions([region])
+        self.paint_regions([region])
 
-    def tinct_selection(self):
+    def paint_selection(self):
         points = [s.a for s in self.view.sel()]
         if points == self.selection_points:
             return
         self.selection_points = points
 
         new_selection = {}
-        gutter_icon = TincterViewsManager.gutter_icon
-        style = TincterViewsManager.style_selection
+        gutter_icon = ColorPainterViewsManager.gutter_icon
+        style = ColorPainterViewsManager.style_selection
         for pt in points:
             row, col = self.view.rowcol(pt)
             if row in self.keys_full_text:
@@ -227,7 +227,7 @@ class TincterViewEventListener(object):
                                 flags=style)
                         break
 
-        style = TincterViewsManager.style_full_text
+        style = ColorPainterViewsManager.style_full_text
         for key in self.keys_selection:
             if key not in new_selection:
                 regions = self.view.get_regions(key)
@@ -255,14 +255,14 @@ class TincterViewEventListener(object):
                 yield self.view.line(sel.a)
 
     def on_load(self):
-        self.tinct_full_text()
+        self.paint_full_text()
 
     def on_selection_modified(self):
-        self.tinct_selection()
+        self.paint_selection()
 
     def on_modified(self):
         # TODO: too much!
-        self.tinct_regions(self.modified_regions())
+        self.paint_regions(self.modified_regions())
         # self.reload()
         # self.on_selection_modified()
 
@@ -270,9 +270,9 @@ class TincterViewEventListener(object):
         pass
 
 
-class TincterViewsManager(sublime_plugin.EventListener):
+class ColorPainterViewsManager(sublime_plugin.EventListener):
     ignored_views = {}
-    tincted_views = {}
+    painted_views = {}
     color_modes = ["hex8", "hex6", "hex4", "hex3",
                     "hsl", "hsla", "rgb", "rgba", "css_named"]
     supported_color_modes = tuple(color_modes)
@@ -288,25 +288,25 @@ class TincterViewsManager(sublime_plugin.EventListener):
     make_rule_selection = None
 
     @classmethod
-    def _tinct_view(cls, view, color_modes):
+    def _paint_view(cls, view, color_modes):
         if not color_modes:
             Loger.error(profile.error_color_modes_missing)
             return
         filename = view.file_name() or "untitled"
-        log = ["_tinct_view:", filename, "+".join(color_modes)]
+        log = ["_paint_view:", filename, "+".join(color_modes)]
         Loger.print("\n\t".join(log))
 
-        view_listener = TincterViewEventListener(view, color_modes)
-        cls.tincted_views[view.view_id] = view_listener
-        cls.tincted_views[view.view_id].on_load()
+        view_listener = ColorPainterViewEventListener(view, color_modes)
+        cls.painted_views[view.view_id] = view_listener
+        cls.painted_views[view.view_id].on_load()
 
 
     @classmethod
     def _load_view(cls, view):
         if view.view_id in cls.ignored_views:
             view_listener = cls.ignored_views.pop(view.view_id)
-            cls.tincted_views[view.view_id] = view_listener
-            cls.tincted_views[view.view_id].on_load()
+            cls.painted_views[view.view_id] = view_listener
+            cls.painted_views[view.view_id].on_load()
             return
 
         filename = view.file_name()
@@ -320,14 +320,14 @@ class TincterViewsManager(sublime_plugin.EventListener):
                 color_modes = [cm for cm in color_modes if cm not in rmv]
             elif ext not in cls.file_types:
                 return
-        cls._tinct_view(view, color_modes)
+        cls._paint_view(view, color_modes)
 
     @classmethod
-    def tinct_view(cls, view):
-        if view.view_id not in cls.tincted_views:
+    def paint_view(cls, view):
+        if view.view_id not in cls.painted_views:
             cls._load_view(view)
-        if view.view_id not in cls.tincted_views:
-            cls._tinct_view(view, cls.color_modes)
+        if view.view_id not in cls.painted_views:
+            cls._paint_view(view, cls.color_modes)
 
     @classmethod
     def load_view(cls, view):
@@ -340,25 +340,25 @@ class TincterViewsManager(sublime_plugin.EventListener):
 
     @classmethod
     def clear_view(cls, view):
-        if view.view_id in cls.tincted_views:
-            view_listener = cls.tincted_views.pop(view.view_id)
+        if view.view_id in cls.painted_views:
+            view_listener = cls.painted_views.pop(view.view_id)
             view_listener.clear_all()
             cls.ignored_views[view.view_id] = view_listener
 
     @classmethod
     def clear_all(cls):
-        for view_listener in cls.tincted_views.values():
+        for view_listener in cls.painted_views.values():
             view_listener.clear_all()
-        cls.ignored_views = cls.tincted_views
-        cls.tincted_views = {}
+        cls.ignored_views = cls.painted_views
+        cls.painted_views = {}
 
     @classmethod
     def clear_and_restart(cls):
-        for view_listener in cls.tincted_views.values():
+        for view_listener in cls.painted_views.values():
             view_listener.clear_all()
         for view_listener in cls.ignored_views.values():
             view_listener.clear_all()
-        cls.tincted_views = {}
+        cls.painted_views = {}
         cls.ignored_views = {}
         for window in sublime.windows():
             for view in window.views():
@@ -394,7 +394,7 @@ class TincterViewsManager(sublime_plugin.EventListener):
             Loger.print("change gutter_icon form \"{}\" to \"{}\"".format(
                 cls.gutter_icon, gutter_icon))
             cls.gutter_icon = gutter_icon
-            for view_listener in cls.tincted_views.values():
+            for view_listener in cls.painted_views.values():
                 view_listener.change_gutter_icon(gutter_icon)
 
     @classmethod
@@ -408,37 +408,37 @@ class TincterViewsManager(sublime_plugin.EventListener):
 
         bg_full_text = cls.cswriter.bg_full_text
         bg_selection = cls.cswriter.bg_selection
-        for view_listener in cls.tincted_views.values():
+        for view_listener in cls.painted_views.values():
             view_listener.rebuild_scheme_rules(bg_full_text, bg_selection)
         cls.write_scheme()
 
     @classmethod
     def write_scheme(cls):
         scheme_rules = []
-        for view_listener in cls.tincted_views.values():
+        for view_listener in cls.painted_views.values():
             scheme_rules.extend(view_listener.scheme_rules_full_text)
             scheme_rules.extend(view_listener.scheme_rules_selection)
         if scheme_rules:
             cls.cswriter.write_color_scheme(scheme_rules)
 
     def on_load(self, view):
-        TincterViewsManager.load_view(view)
+        ColorPainterViewsManager.load_view(view)
 
     def on_modified(self, view):
-        if view.view_id in self.tincted_views:
-            view_listener = self.tincted_views[view.view_id]
+        if view.view_id in self.painted_views:
+            view_listener = self.painted_views[view.view_id]
             view_listener.on_modified()
 
     def on_selection_modified(self, view):
-        if view.view_id in self.tincted_views:
+        if view.view_id in self.painted_views:
             if self.style_selection == self.style_full_text:
                 return
-            view_listener = self.tincted_views[view.view_id]
+            view_listener = self.painted_views[view.view_id]
             view_listener.on_selection_modified()
 
     def on_activated(self, view):
-        if view.view_id in self.tincted_views:
-            view_listener = self.tincted_views[view.view_id]
+        if view.view_id in self.painted_views:
+            view_listener = self.painted_views[view.view_id]
             view_listener.on_activated()
         else:
             self.on_load(view)
@@ -447,8 +447,8 @@ class TincterViewsManager(sublime_plugin.EventListener):
         self.on_activated(view)
 
     def on_close(self, view):
-        if view.view_id in self.tincted_views:
-            self.tincted_views.pop(view.view_id)
+        if view.view_id in self.painted_views:
+            self.painted_views.pop(view.view_id)
         elif view.view_id in self.ignored_views:
             self.ignored_views.pop(view.view_id)
 
@@ -476,7 +476,7 @@ def load_plugin(plugin):
 
     global settings
     global preferences
-    settings = sublime.load_settings("Tincter.sublime-settings")
+    settings = sublime.load_settings("ColorPainter.sublime-settings")
     preferences = sublime.load_settings("Preferences.sublime-settings")
 
     _reload_color_scheme()
@@ -489,11 +489,11 @@ def load_plugin(plugin):
 def plugin_loaded():
     os.makedirs(profile._color_scheme_cache_dir(relative=False), exist_ok=True)
 
-    load_plugin(TincterViewsManager)
+    load_plugin(ColorPainterViewsManager)
     view = sublime.active_window().active_view()
-    TincterViewsManager.load_view(view)
+    ColorPainterViewsManager.load_view(view)
 
 def plugin_unloaded():
     settings.clear_on_change("highlight_style")
     preferences.clear_on_change("color_scheme")
-    TincterViewsManager.clear_all()
+    ColorPainterViewsManager.clear_all()

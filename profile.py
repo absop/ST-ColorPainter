@@ -3,7 +3,7 @@ import sublime
 from .sublime_css_colors import sublime_css_colors
 
 scheme_data = {
-    "name": "Tincter",
+    "name": "ColorPainter",
     "author": "https://github.com/absop",
     "variables": {},
     "globals": {},
@@ -17,7 +17,7 @@ Please make your selection among them!
 """
 
 error_color_modes_missing = """
-Tincter not work at current file, because no color_modes
+ColorPainter not work at current file, because no color_modes
 are added! If you had added color_modes for current file,
 it's because settings still not be loaded.
                                 Restart will be helpful!

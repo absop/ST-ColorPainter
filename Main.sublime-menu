@@ -10,22 +10,22 @@
                 "children":
                 [
                     {
-                        "caption": "Tincter",
+                        "caption": "ColorPainter",
                         "mnemonic": "T",
                         "children":
                         [
                             {
                                 "caption": "README",
                                 "command": "open_file",
-                                "args": {"file": "${packages}/Tincter/README.md"}
+                                "args": {"file": "${packages}/ColorPainter/README.md"}
                             },
                             { "caption": "-" },
                             {
                                 "caption": "Settings",
                                 "command": "edit_settings",
                                 "args": {
-                                    "base_file": "${packages}/Tincter/Tincter.sublime-settings",
-                                    "default": "// Tincter Preferences – User\n// ====================================================\n\n{\n\t$0\n}\n"
+                                    "base_file": "${packages}/ColorPainter/ColorPainter.sublime-settings",
+                                    "default": "// ColorPainter Preferences – User\n// ====================================================\n\n{\n\t$0\n}\n"
                                 }
                             },
                         ]

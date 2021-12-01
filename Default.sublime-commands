@@ -1,22 +1,22 @@
 [
     {
-        "caption": "Preferences: Tincter Settings",
+        "caption": "Preferences: ColorPainter Settings",
         "command": "edit_settings",
         "args": {
-          "base_file": "${packages}/Tincter/Tincter.sublime-settings",
-          "default": "/*\n\tTincter user settings in here override the default\n*/\n{\n\t$0\n}\n"
+          "base_file": "${packages}/ColorPainter/ColorPainter.sublime-settings",
+          "default": "/*\n\tColorPainter user settings in here override the default\n*/\n{\n\t$0\n}\n"
           }
     },
     {
-        "caption": "Tincter: tinct view",
-        "command": "tincter_tinct_view",
+        "caption": "Color Painter: paint view",
+        "command": "color_painter_paint_view",
     },
     {
-        "caption": "Tincter: clear view",
-        "command": "tincter_clear_view",
+        "caption": "Color Painter: clear view",
+        "command": "color_painter_clear_view",
     },
     {
-        "caption": "Tincter: toggle log",
-        "command": "tincter_toggle_log",
+        "caption": "Color Painter: toggle log",
+        "command": "color_painter_toggle_log",
     }
 ]
